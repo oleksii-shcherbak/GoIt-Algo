@@ -1,4 +1,5 @@
 def binary_search_upper_bound(arr, target):
+    """Binary search to find the upper bound of a target value in a sorted array."""
     left = 0
     right = len(arr) - 1
     upper_bound = None
