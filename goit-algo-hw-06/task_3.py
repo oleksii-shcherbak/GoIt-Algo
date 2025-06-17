@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import heapq
 
 
 G = nx.Graph()
@@ -9,7 +10,6 @@ stations = [
     "Museum", "University", "Airport", "Stadium", "Park"
 ]
 
-# Weighted connections (for Task 3)
 connections = [
     ("Central", "North", 4),
     ("Central", "South", 2),
@@ -27,21 +27,12 @@ connections = [
 G.add_nodes_from(stations)
 G.add_weighted_edges_from(connections)
 
-pos = nx.spring_layout(G, seed=42)  # use fixed layout for consistency
+pos = nx.spring_layout(G, seed=42)
 
 plt.figure(figsize=(10, 7))
-nx.draw(
-    G, pos,
-    with_labels=True,
-    node_color='pink',
-    node_size=2500,
-    font_weight='bold'
-)
-
-# Draw edge weights
+nx.draw(G, pos, with_labels=True, node_color='pink', node_size=2500, font_weight='bold')
 edge_labels = nx.get_edge_attributes(G, 'weight')
 nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-
 plt.title("City Metro Network with Edge Weights")
 plt.show()
 
@@ -51,41 +42,53 @@ print("\nDegree of each station:")
 for node, degree in G.degree():
     print(f"- {node}: {degree} connection(s)")
 
-start = "Central"
-end = "Stadium"
+def dijkstra(graph, start):
+    """
+    Calculate shortest paths from start node to all other nodes using Dijkstra's algorithm.
+    """
+    distances = {node: float('inf') for node in graph.nodes}
+    previous = {node: None for node in graph.nodes}
+    distances[start] = 0
+    heap = [(0, start)]
 
-# BFS (shortest path by number of hops)
-bfs_path = nx.shortest_path(G, source=start, target=end)
+    while heap:
+        current_distance, current_node = heapq.heappop(heap)
 
-# DFS (first depth path)
-dfs_edges = list(nx.dfs_edges(G, source=start))
-dfs_path = [start]
-visited = {start}
+        for neighbor in graph.neighbors(current_node):
+            weight = graph[current_node][neighbor]['weight']
+            distance = current_distance + weight
 
-for u, v in dfs_edges:
-    if u in dfs_path and v not in visited:
-        dfs_path.append(v)
-        visited.add(v)
-    if v == end:
-        break
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                previous[neighbor] = current_node
+                heapq.heappush(heap, (distance, neighbor))
 
-print("\nBFS path (shortest path by edges):")
-print(" -> ".join(bfs_path))
+    # Build final paths
+    paths = {}
+    for target in graph.nodes:
+        if distances[target] == float('inf'):
+            paths[target] = None
+        else:
+            path = []
+            node = target
+            while node is not None:
+                path.insert(0, node)
+                node = previous[node]
+            paths[target] = path
 
-print("\nDFS path (first depth-found path):")
-print(" -> ".join(dfs_path))
+    return distances, paths
 
-# Dijkstra's algorithm for shortest path with weights
-print("\nShortest paths using Dijkstra's algorithm (with weights):")
+print("\nShortest paths using manual Dijkstra's algorithm:")
 
-# Compute and display shortest path from each station to all others
-all_shortest_paths = dict(nx.all_pairs_dijkstra_path(G))
-all_shortest_lengths = dict(nx.all_pairs_dijkstra_path_length(G))
-
+# Calculate shortest paths from each station
 for src in stations:
+    distances, paths = dijkstra(G, src)
     print(f"\nFrom {src}:")
     for dst in stations:
         if src != dst:
-            path = all_shortest_paths[src][dst]
-            distance = all_shortest_lengths[src][dst]
-            print(f" - to {dst}: {' -> '.join(path)} (distance: {distance})")
+            path = paths[dst]
+            dist = distances[dst]
+            if path is not None:
+                print(f" - to {dst}: {' -> '.join(path)} (distance: {dist})")
+            else:
+                print(f" - to {dst}: No path found")
