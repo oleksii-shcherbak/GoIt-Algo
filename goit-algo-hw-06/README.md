@@ -5,17 +5,15 @@ This task implements two graph traversal algorithms — Depth-First Search (DFS)
 ---
 
 **BFS path:**
-Central → West → Park → Stadium
+Central → North → University → Stadium
 
 **DFS path:**
-Central → North → University → Museum → East → Stadium
+Central → East → Museum → University → Stadium
 
 ---
 
-Both paths are valid but differ in length and structure due to the nature of the algorithms.
+BFS explores the graph level by level. It found the shortest path to "Stadium" through "North" and "University", using only three steps. This is expected since BFS is designed to return the shortest path in an unweighted graph.
 
-BFS explores the graph level by level. It found the shortest path to "Stadium" in just three steps, going through "West" and "Park". This is expected, as BFS is designed to return the shortest path (by number of edges) in an unweighted graph.
+DFS, on the other hand, explores as deeply as possible along one branch before backtracking. It first followed "East", then "Museum", "University", and finally "Stadium", resulting in a longer but valid path.
 
-DFS, on the other hand, explores as deeply as possible before backtracking. It followed a longer route through "North", "University", "Museum", and "East" before reaching "Stadium". This path is valid but not the most efficient. DFS does not guarantee the shortest path, especially when multiple paths exist.
-
-The difference in output is caused by the order of node exploration. BFS ensures minimal steps, while DFS follows the first discovered complete path regardless of length.
+This difference in results is due to the traversal strategy. BFS prioritizes minimal steps, while DFS returns the first valid path it discovers, which may not be optimal.

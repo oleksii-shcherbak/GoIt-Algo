@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from collections import deque
 
 
 G = nx.Graph()
@@ -26,7 +27,15 @@ connections = [
 G.add_nodes_from(stations)
 G.add_edges_from(connections)
 
-nx.draw(G, with_labels=True, node_color='pink', node_size=2500, font_weight='bold')
+pos = nx.spring_layout(G, seed=42)
+plt.figure(figsize=(10, 7))
+nx.draw(
+    G, pos,
+    with_labels=True,
+    node_color='pink',
+    node_size=2500,
+    font_weight='bold'
+)
 plt.title("City Metro Network")
 plt.show()
 
@@ -36,25 +45,53 @@ print("\nDegree of each station:")
 for node, degree in G.degree():
     print(f"- {node}: {degree} connection(s)")
 
+def bfs(graph, start, target):
+    visited = set()
+    queue = deque([[start]])
+
+    while queue:
+        path = queue.popleft()
+        node = path[-1]
+
+        if node == target:
+            return path
+
+        if node not in visited:
+            visited.add(node)
+            for neighbor in sorted(graph.neighbors(node)):  # sorted for stable order
+                if neighbor not in visited:
+                    new_path = list(path)
+                    new_path.append(neighbor)
+                    queue.append(new_path)
+    return None
+
+def dfs(graph, start, target):
+    visited = set()
+    stack = [[start]]
+
+    while stack:
+        path = stack.pop()
+        node = path[-1]
+
+        if node == target:
+            return path
+
+        if node not in visited:
+            visited.add(node)
+            for neighbor in reversed(sorted(graph.neighbors(node))):  # reversed(sorted) for deep-first order
+                if neighbor not in visited:
+                    new_path = list(path)
+                    new_path.append(neighbor)
+                    stack.append(new_path)
+    return None
+
 start = "Central"
 end = "Stadium"
 
-# BFS (shortest path)
-bfs_path = nx.shortest_path(G, source=start, target=end)
+bfs_path = bfs(G, start, end)
+dfs_path = dfs(G, start, end)
 
-# DFS (first depth path)
-dfs_edges = list(nx.dfs_edges(G, source=start))
-dfs_path = [start]
-visited = {start}
-
-for u, v in dfs_edges:
-    if u in dfs_path and v not in visited:
-        dfs_path.append(v)
-        visited.add(v)
-    if v == end:
-        break
-
-print("\nBFS path (shortest path):")
+print("\nBFS path (shortest path by edges):")
 print(" -> ".join(bfs_path))
 
 print("\nDFS path (first depth-found path):")
