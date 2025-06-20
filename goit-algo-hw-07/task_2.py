@@ -39,7 +39,7 @@ def find_min_value(root):
 
 def print_inorder(root):
     """Print the BST in inorder traversal"""
-    if root:
+    if root is not None:
         print_inorder(root.left)
         print(root.val, end=" ")
         print_inorder(root.right)

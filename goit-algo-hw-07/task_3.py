@@ -17,24 +17,20 @@ def insert(root, key):
     return root
 
 
-def find_max_value(root):
+def sum_all_values(root):
     """
-    Find the maximum value in a Binary Search Tree.
+    Calculate the sum of all values in a Binary Search Tree.
 
     Args:
         root: The root node of the BST
 
     Returns:
-        The maximum value in the tree, or None if tree is empty
+        The sum of all values in the tree, or 0 if tree is empty
     """
     if root is None:
-        return None
+        return 0
 
-    current = root
-    while current.right is not None:
-        current = current.right
-
-    return current.val
+    return root.val + sum_all_values(root.left) + sum_all_values(root.right)
 
 
 def print_inorder(root):
@@ -62,6 +58,6 @@ if __name__ == "__main__":
     print_inorder(root)
     print()
 
-    # Find maximum value
-    max_value = find_max_value(root)
-    print(f"Maximum value: {max_value}")
+    # Calculate sum of all values
+    total_sum = sum_all_values(root)
+    print(f"Sum of all values: {total_sum}")
