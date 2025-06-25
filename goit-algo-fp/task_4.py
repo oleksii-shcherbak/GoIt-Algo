@@ -76,11 +76,12 @@ def draw_tree(tree_root):
     nx.draw(tree, pos=pos, labels=labels, arrows=False, node_size=2500, node_color=colors)
     plt.show()
 
-# Binary heap represented as a list
-heap = [1, 3, 6, 5, 9, 8, 10, 13, 15]
+if __name__ == "__main__":
+    # Binary heap represented as a list
+    heap = [1, 3, 6, 5, 9, 8, 10, 13, 15]
 
-# Build binary tree from heap array
-root = build_heap_tree(heap)
+    # Build binary tree from heap array
+    root = build_heap_tree(heap)
 
-# Visualize the binary tree
-draw_tree(root)
+    # Visualize the binary tree
+    draw_tree(root)
